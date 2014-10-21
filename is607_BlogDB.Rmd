@@ -1,0 +1,222 @@
+---
+title: "is607_Week8Assignment_BlogDB"
+author: "Prashant B. Bhuyan"
+date: "October 21, 2014"
+output: pdf_document
+---
+
+Solution 1: 
+
+http://learning.blogs.nytimes.com
+
+This blog has comments and tags enabled and I've scanned the environment. 
+
+Solution 2: 
+
+Key Entities for the ER Diagram are: 
+
+db_User: A table that contains information including the Username, Password and Email Address of each user.
+
+db_UserMetaInfo: A table that contains meta information about the User including VisitsPerMonth and LengthOfAccount(Months).
+
+db_usercomments: A table that stores comment information including the username and the status/state of the user's comment (pending, removed, posted).
+
+db_userposts: A table that contains information about posts including the username and the type of post that the user made (image, video, text).
+
+(Please See Uploaded .PNG File of Hand Drawn ER Diagram).
+
+Solution 3: 
+
+You can see script below in solution #4 for the create tables scripts. 
+
+
+Solution 4: 
+
+# Create User Schema
+
+-- Schema: USER
+
+-- DROP SCHEMA "USER";
+
+CREATE SCHEMA "USER"
+  AUTHORIZATION postgres;
+
+
+# Create User Info Table
+
+-- Table: "USER"."UserINFO"
+
+-- DROP TABLE "USER"."UserINFO";
+
+
+CREATE TABLE "USER"."UserINFO"
+(
+  "Username" text,
+  "Password" text,
+  "Email" text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "USER"."UserINFO"
+  OWNER TO postgres;
+
+# Populate User Info
+
+INSERT INTO "USER"."UserINFO" VALUES ('trex', 'password2', 'trex@gmail.com');
+INSERT INTO "USER"."UserINFO" VALUES ('randoman', 'password3', 'randoman@yahoo.com');
+INSERT INTO "USER"."UserINFO" VALUES ('tbone', 'pass', 'tbone@hotmail.com');
+
+SELECT * FROM "USER"."UserINFO" 
+
+Results: 
+
+"trex";"password2";"trex@gmail.com"
+"randoman";"password3";"randoman@yahoo.com"
+"tbone";"passw";"tbone@hotmail.com"
+
+
+# Create User Meta Info Table
+
+-- Table: "USER"."UserMetaInfo"
+
+-- DROP TABLE "USER"."UserMetaInfo";
+
+
+CREATE TABLE "USER"."UserMetaInfo"
+(
+  "VisitsPerMonth" integer,
+  "LengthOfAcct(Months)" integer
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "USER"."UserMetaInfo"
+  OWNER TO postgres;
+
+# Populate User Meta Info Table
+
+INSERT INTO "USER"."UserMetaInfo" VALUES ('24','3');
+INSERT INTO "USER"."UserMetaInfo" VALUES ('150','10');
+INSERT INTO "USER"."UserMetaInfo" VALUES ('44','12');
+
+SELECT * FROM "USER"."UserMetaInfo" 
+
+Results: 
+
+24;3
+150;10
+44;12
+
+
+# Create Posts Schema
+
+-- Schema: POSTS
+
+-- DROP SCHEMA "POSTS";
+
+CREATE SCHEMA "POSTS"
+  AUTHORIZATION postgres;
+
+
+
+-- Table: "POSTS".userposts
+
+-- DROP TABLE "POSTS".userposts;
+
+# Create User Posts Table
+
+CREATE TABLE "POSTS".userposts
+(
+  "User" text,
+  "PostType" text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "POSTS".userposts
+  OWNER TO postgres;
+
+# Populate User Posts Table
+
+INSERT INTO "POSTS"."userposts" VALUES ('trex','image');
+INSERT INTO "POSTS"."userposts" VALUES ('trex','text');
+INSERT INTO "POSTS"."userposts" VALUES ('tbone','video');
+INSERT INTO "POSTS"."userposts" VALUES ('randoman','image');
+
+SELECT * FROM "POSTS"."userposts"
+
+Results: 
+
+"trex";"image"
+"trex";"text"
+"tbone";"video"
+"randoman";"image"
+
+
+
+# Create Comment Schema
+
+-- Schema: COMMENTS
+
+-- DROP SCHEMA "COMMENTS";
+
+CREATE SCHEMA "COMMENTS"
+  AUTHORIZATION postgres;
+  
+# Create User Comments Table
+
+-- Table: "COMMENTS".usercomments
+
+-- DROP TABLE "COMMENTS".usercomments;
+
+CREATE TABLE "COMMENTS".usercomments
+(
+  "User" text,
+  "CommentStatus" text
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE "COMMENTS".usercomments
+  OWNER TO postgres;
+
+
+# Populate User Comments Table
+
+INSERT INTO "COMMENTS"."usercomments" VALUES ('trex','pending');
+INSERT INTO "COMMENTS"."usercomments" VALUES ('tbone','posted');
+INSERT INTO "COMMENTS"."usercomments" VALUES ('tbone','pending');
+INSERT INTO "COMMENTS"."usercomments" VALUES ('randoman','removed');
+
+SELECT * FROM "COMMENTS"."usercomments"
+
+Results: 
+
+"trex";"pending"
+"tbone";"posted"
+"tbone";"pending"
+"randoman";"removed"
+
+
+
+Solution 5: 
+
+# Part 1
+SELECT * FROM "COMMENTS"."usercomments" CROSS JOIN "POSTS"."userposts" WHERE "COMMENTS"."usercomments"."User" = "POSTS"."userposts"."User"
+
+Results: 
+"trex";"pending";"trex";"text"
+"trex";"pending";"trex";"image"
+"tbone";"posted";"tbone";"video"
+"tbone";"pending";"tbone";"video"
+"randoman";"removed";"randoman";"image"
+
+# Part 2
+SELECT * FROM "COMMENTS"."usercomments" CROSS JOIN "POSTS"."userposts" WHERE "COMMENTS"."usercomments"."User" = "POSTS"."userposts"."User" AND "POSTS"."userposts"."PostType" = 'video'
+
+Results: 
+"tbone";"posted";"tbone";"video"
+"tbone";"pending";"tbone";"video"
+
+
